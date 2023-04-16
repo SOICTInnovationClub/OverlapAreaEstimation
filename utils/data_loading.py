@@ -22,7 +22,6 @@ def load_image(filename):
     else:
         return Image.open(filename)
 
-
 def unique_mask_values(idx, mask_dir, mask_suffix):
     mask_file = list(mask_dir.glob(idx + mask_suffix + '.*'))[0]
     mask = np.asarray(load_image(mask_file))

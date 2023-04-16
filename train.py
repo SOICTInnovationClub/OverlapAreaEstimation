@@ -16,6 +16,7 @@ from tqdm import tqdm
 import wandb
 from evaluate import evaluate
 from unet import UNet
+from utils.new_data_loading import OverlapDataset
 from utils.data_loading import BasicDataset, CarvanaDataset
 from utils.dice_score import dice_loss
 
@@ -32,17 +33,19 @@ def train_model(
         learning_rate: float = 1e-5,
         val_percent: float = 0.1,
         save_checkpoint: bool = True,
-        img_scale: float = 0.5,
+        img_scale: float = 0.0625,
         amp: bool = False,
         weight_decay: float = 1e-8,
         momentum: float = 0.999,
         gradient_clipping: float = 1.0,
 ):
     # 1. Create dataset
-    try:
-        dataset = CarvanaDataset(dir_img, dir_mask, img_scale)
-    except (AssertionError, RuntimeError, IndexError):
-        dataset = BasicDataset(dir_img, dir_mask, img_scale)
+    # try:
+    #     dataset = CarvanaDataset(dir_img, dir_mask, img_scale)
+    # except (AssertionError, RuntimeError, IndexError):
+    #     dataset = BasicDataset(dir_img, dir_mask, img_scale)
+    
+    dataset = OverlapDataset("/home/edtechai/Works/Pytorch-UNet/data/DATA_HACKATHON", img_scale)
 
     # 2. Split into train / validation partitions
     n_val = int(len(dataset) * val_percent)
@@ -168,7 +171,7 @@ def train_model(
 
 def get_args():
     parser = argparse.ArgumentParser(description='Train the UNet on images and target masks')
-    parser.add_argument('--epochs', '-e', metavar='E', type=int, default=5, help='Number of epochs')
+    parser.add_argument('--epochs', '-e', metavar='E', type=int, default=10, help='Number of epochs')
     parser.add_argument('--batch-size', '-b', dest='batch_size', metavar='B', type=int, default=1, help='Batch size')
     parser.add_argument('--learning-rate', '-l', metavar='LR', type=float, default=1e-5,
                         help='Learning rate', dest='lr')
